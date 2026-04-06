@@ -6,5 +6,6 @@ add_library(sdvgw-can STATIC
     SocketCANReader.cpp
     SimulatedCANReader.cpp
 )
-target_include_directories(sdvgw-can PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+# Expose src/ as include root so consumers use <can/ICANReader.hpp>
+target_include_directories(sdvgw-can PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(sdvgw-can PUBLIC spdlog::spdlog)
