@@ -13,14 +13,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     protobuf-compiler-grpc \
     nlohmann-json3-dev \
     libspdlog-dev \
+    libgtest-dev \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src
 COPY . .
 
-RUN cmake -B build -DCMAKE_BUILD_TYPE=Release \
-    && cmake --build build -j"$(nproc)"
+RUN cmake -B build -DCMAKE_BUILD_TYPE=Release
+RUN cmake --build build -j$(nproc)
 
 # ---------------------------------------------------------------------------
 # Stage 2 — runtime
