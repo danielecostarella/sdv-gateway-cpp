@@ -1,3 +1,2 @@
-add_executable(can-simulator placeholder.cpp)
-target_link_libraries(can-simulator PRIVATE spdlog::spdlog)
-# Sources replaced in feat(tools).
+add_executable(can-simulator main.cpp)
+target_link_libraries(can-simulator PRIVATE Threads::Threads)

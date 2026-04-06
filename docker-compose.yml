@@ -9,18 +9,18 @@
 # Usage:
 #   docker compose up
 #
-# The gateway container creates vcan0 in its network namespace.
+# The gateway container creates vcan0 in its network namespace (via
+# docker-entrypoint.sh with CAP_NET_ADMIN + CAP_SYS_MODULE).
 # The can-simulator shares that namespace (network_mode: service:gateway)
-# so both processes see the same virtual CAN interface.
+# so both processes read/write the same virtual CAN interface.
 #
-# Requires Docker with Linux kernel capabilities (works on Linux and
-# macOS via Docker Desktop's Linux VM).
+# Both gateway and can-simulator are built from the same image (root
+# Dockerfile, runtime stage). The can-simulator service overrides CMD.
 
 services:
 
   kuksa-databroker:
     image: ghcr.io/eclipse-kuksa/kuksa-databroker:latest
-    # ARM64 image is published alongside amd64 — Docker pulls the right one.
     command: ["--insecure"]   # TLS disabled for local dev (see ADR-001)
     ports:
       - "55555:55555"
@@ -44,9 +44,11 @@ services:
 
   can-simulator:
     build:
-      context: tools/can-simulator
-    # Shares the gateway network namespace → sees the same vcan0.
+      context: .
+      target: runtime
+    # Shares the gateway network namespace → same vcan0 interface
     network_mode: "service:gateway"
+    command: ["./can-simulator", "--interface", "vcan0", "--interval", "100"]
     depends_on:
       - gateway
     restart: unless-stopped
