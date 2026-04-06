@@ -1,0 +1,33 @@
+# Build directories
+build/
+out/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+compile_commands.json
+_deps/
+
+# Generated protobuf sources
+generated/
+
+# Fetched proto files
+proto/kuksa/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Binaries
+*.o
+*.a
+*.so
+*.out
+
+# Test results
+Testing/

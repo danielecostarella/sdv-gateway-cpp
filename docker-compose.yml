@@ -1,0 +1,52 @@
+---
+# SDV Gateway — local development stack
+#
+# Services:
+#   kuksa-databroker  Eclipse Kuksa Databroker (VSS signal store)
+#   gateway           sdv-gateway-cpp (CAN → VSS → gRPC feeder)
+#   can-simulator     Injects synthetic CAN frames into vcan0
+#
+# Usage:
+#   docker compose up
+#
+# The gateway container creates vcan0 in its network namespace.
+# The can-simulator shares that namespace (network_mode: service:gateway)
+# so both processes see the same virtual CAN interface.
+#
+# Requires Docker with Linux kernel capabilities (works on Linux and
+# macOS via Docker Desktop's Linux VM).
+
+services:
+
+  kuksa-databroker:
+    image: ghcr.io/eclipse-kuksa/kuksa-databroker:latest
+    # ARM64 image is published alongside amd64 — Docker pulls the right one.
+    command: ["--insecure"]   # TLS disabled for local dev (see ADR-001)
+    ports:
+      - "55555:55555"
+    restart: unless-stopped
+
+  gateway:
+    build:
+      context: .
+      target: runtime
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    volumes:
+      - /lib/modules:/lib/modules:ro
+      - ./config:/app/config:ro
+    environment:
+      KUKSA_ENDPOINT: "kuksa-databroker:55555"
+    depends_on:
+      - kuksa-databroker
+    restart: unless-stopped
+
+  can-simulator:
+    build:
+      context: tools/can-simulator
+    # Shares the gateway network namespace → sees the same vcan0.
+    network_mode: "service:gateway"
+    depends_on:
+      - gateway
+    restart: unless-stopped
