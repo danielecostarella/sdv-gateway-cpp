@@ -46,7 +46,7 @@ std::shared_ptr<grpc::ChannelCredentials> make_credentials(const KuksaConfig& cf
 ///
 /// C++ field name rules: protobuf appends '_' to names that clash with C++ keywords,
 /// so proto field "float" → set_float_(), proto field "bool" → set_bool_().
-void set_datapoint_value(kuksa::val::v2::Datapoint& dp,
+void set_datapoint_value(::kuksa::val::v2::Datapoint& dp,
                          const decoder::VssSignal::Value& value)
 {
     auto* v = dp.mutable_value();
@@ -73,7 +73,7 @@ bool KuksaClient::connect()
         args.SetMaxReceiveMessageSize(4 * 1024 * 1024);  // 4 MB
 
         channel_ = grpc::CreateCustomChannel(config_.endpoint, creds, args);
-        stub_    = kuksa::val::v2::VAL::NewStub(channel_);
+        stub_    = ::kuksa::val::v2::VAL::NewStub(channel_);
 
         spdlog::info("KuksaClient: channel created to '{}'", config_.endpoint);
         return true;
@@ -106,7 +106,7 @@ bool KuksaClient::publish(std::span<const decoder::VssSignal> signals)
 
 bool KuksaClient::publish_one(const decoder::VssSignal& signal)
 {
-    kuksa::val::v2::PublishValueRequest request;
+    ::kuksa::val::v2::PublishValueRequest request;
     // SignalID is a message with oneof { int32 id; string path; }
     request.mutable_signal_id()->set_path(signal.vss_path);
 
@@ -119,7 +119,7 @@ bool KuksaClient::publish_one(const decoder::VssSignal& signal)
         context.AddMetadata("authorization", "Bearer " + config_.auth_token);
     }
 
-    kuksa::val::v2::PublishValueResponse response;
+    ::kuksa::val::v2::PublishValueResponse response;
     const grpc::Status status = stub_->PublishValue(&context, request, &response);
 
     if (!status.ok()) {

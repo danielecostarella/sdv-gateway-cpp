@@ -44,7 +44,7 @@ private:
 
     KuksaConfig                                  config_;
     std::shared_ptr<grpc::Channel>               channel_;
-    std::unique_ptr<kuksa::val::v2::VAL::Stub>   stub_;
+    std::unique_ptr<::kuksa::val::v2::VAL::Stub>  stub_;
 };
 
 } // namespace sdvgw::kuksa
