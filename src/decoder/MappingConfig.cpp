@@ -12,14 +12,16 @@ namespace {
 
 SignalType parse_type(const std::string& s)
 {
-    if (s == "float")                return SignalType::Float;
+    if (s == "float")                   return SignalType::Float;
     if (s == "uint16" || s == "uint32") return SignalType::Uint32;
-    if (s == "bool")                 return SignalType::Bool;
+    if (s == "bool")                    return SignalType::Bool;
     throw std::invalid_argument("unknown signal type '" + s +
                                 "' (expected: float, uint16, uint32, bool)");
 }
 
-MappingConfig parse(const nlohmann::json& root)
+} // namespace
+
+MappingConfig MappingConfig::parse(const nlohmann::json& root)
 {
     MappingConfig cfg;
 
@@ -59,8 +61,6 @@ MappingConfig parse(const nlohmann::json& root)
     spdlog::info("MappingConfig: loaded {} frame mapping(s)", cfg.mappings_.size());
     return cfg;
 }
-
-} // namespace
 
 std::optional<MappingConfig> MappingConfig::from_file(const std::string& path)
 {

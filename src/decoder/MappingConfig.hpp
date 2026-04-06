@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <nlohmann/json_fwd.hpp>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -46,6 +47,8 @@ public:
     std::size_t frame_count() const noexcept { return mappings_.size(); }
 
 private:
+    static MappingConfig parse(const nlohmann::json& root);
+
     std::vector<FrameMapping>              mappings_;
     std::unordered_map<uint32_t, uint32_t> index_;  ///< can_id → index in mappings_
 };

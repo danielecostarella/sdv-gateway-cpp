@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
     git \
+    pkg-config \
     libgrpc++-dev \
     libprotobuf-dev \
     protobuf-compiler-grpc \
