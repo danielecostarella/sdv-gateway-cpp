@@ -39,15 +39,22 @@ std::shared_ptr<grpc::ChannelCredentials> make_credentials(const KuksaConfig& cf
 }
 
 /// Set the typed value on a Datapoint from a VssSignal::Value variant.
-/// Field names follow the protobuf C++ generated API for kuksa.val.v2.Datapoint.
+///
+/// Proto structure (types.proto):
+///   Datapoint { Value value = 2; }
+///   Value     { oneof typed_value { float float=17; uint32 uint32=15; bool bool=12; ... } }
+///
+/// C++ field name rules: protobuf appends '_' to names that clash with C++ keywords,
+/// so proto field "float" → set_float_(), proto field "bool" → set_bool_().
 void set_datapoint_value(kuksa::val::v2::Datapoint& dp,
                          const decoder::VssSignal::Value& value)
 {
-    std::visit([&dp](const auto& v) {
-        using T = std::decay_t<decltype(v)>;
-        if constexpr (std::is_same_v<T, float>)    dp.set_float_(v);
-        else if constexpr (std::is_same_v<T, uint32_t>) dp.set_uint32(v);
-        else if constexpr (std::is_same_v<T, bool>)    dp.set_bool_(v);
+    auto* v = dp.mutable_value();
+    std::visit([v](const auto& val) {
+        using T = std::decay_t<decltype(val)>;
+        if constexpr (std::is_same_v<T, float>)      v->set_float_(val);
+        else if constexpr (std::is_same_v<T, uint32_t>) v->set_uint32(val);
+        else if constexpr (std::is_same_v<T, bool>)     v->set_bool_(val);
     }, value);
 }
 
@@ -100,7 +107,8 @@ bool KuksaClient::publish(std::span<const decoder::VssSignal> signals)
 bool KuksaClient::publish_one(const decoder::VssSignal& signal)
 {
     kuksa::val::v2::PublishValueRequest request;
-    request.set_signal_id(signal.vss_path);
+    // SignalID is a message with oneof { int32 id; string path; }
+    request.mutable_signal_id()->set_path(signal.vss_path);
 
     auto* dp = request.mutable_data_point();
     set_datapoint_value(*dp, signal.value);
