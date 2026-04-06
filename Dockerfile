@@ -26,15 +26,18 @@ RUN cmake -B build -DCMAKE_BUILD_TYPE=Release \
 # Stage 2 — runtime
 # Keeps only the gateway binary and config.
 # iproute2 + kmod needed to set up vcan0 inside the container.
+# Uses -dev packages to avoid version-specific runtime package names
+# (e.g. libgrpc++1.51) that change across Debian snapshots.
 # ---------------------------------------------------------------------------
 FROM debian:bookworm-slim AS runtime
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgrpc++1.51 \
-    libprotobuf32 \
-    libspdlog1.10-dev \
+    libgrpc++-dev \
+    libprotobuf-dev \
+    libspdlog-dev \
     iproute2 \
     kmod \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

@@ -6,6 +6,8 @@ A minimalist automotive gateway written in C++20 following the **Signal-to-Servi
 
 The gateway reads raw CAN frames from a SocketCAN interface, normalises them against the [COVESA Vehicle Signal Specification (VSS)](https://github.com/COVESA/vehicle_signal_specification), and feeds the resulting typed signals into [Eclipse Kuksa Databroker](https://github.com/eclipse-kuksa/kuksa-databroker) via gRPC — filling a gap in the Eclipse SDV ecosystem where no official C++ CAN feeder exists.
 
+> **Disclaimer:** This project is a personal study and learning exercise exploring modern SDV architectures and the Eclipse automotive open-source ecosystem. It is not intended for production use, does not represent the work or technology of any employer or client, and contains no proprietary or confidential information.
+
 ---
 
 ## Architecture
