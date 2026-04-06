@@ -1,0 +1,30 @@
+---
+# clang-tidy configuration for sdv-gateway-cpp.
+# Focus: real bugs and safety issues — no style noise.
+
+Checks: >-
+  bugprone-use-after-move,
+  bugprone-infinite-loop,
+  bugprone-integer-division,
+  bugprone-suspicious-memset-usage,
+  bugprone-not-null-terminated-result,
+  clang-analyzer-core.*,
+  clang-analyzer-unix.API,
+  clang-analyzer-unix.Malloc,
+  clang-analyzer-cplusplus.*,
+  modernize-use-nullptr,
+  modernize-use-override,
+  modernize-use-emplace,
+  performance-unnecessary-copy-initialization,
+  performance-unnecessary-value-param,
+  -clang-diagnostic-unused-command-line-argument
+
+# Promote warnings to errors in CI (set via --warnings-as-errors in workflow
+# when the codebase is clean enough; left empty here to avoid blocking PRs
+# on pre-existing warnings from generated headers).
+WarningsAsErrors: ''
+
+# Only report diagnostics originating in project headers (not grpc/protobuf).
+HeaderFilterRegex: 'src/.*\.hpp$'
+
+FormatStyle: none
