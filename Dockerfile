@@ -47,8 +47,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-COPY --from=builder /src/build/sdv-gateway                          ./sdv-gateway
-COPY --from=builder /src/build/tools/can-simulator/can-simulator    ./can-simulator
+COPY --from=builder /src/build/sdv-gateway     ./sdv-gateway
+COPY --from=builder /src/build/can-simulator   ./can-simulator
 COPY --from=builder /src/docker-entrypoint.sh                       ./docker-entrypoint.sh
 COPY config/                                                         ./config/
 
