@@ -10,9 +10,21 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # ---------------------------------------------------------------------------
 find_package(Threads REQUIRED)
 find_package(Protobuf REQUIRED)
-find_package(gRPC CONFIG REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(nlohmann_json REQUIRED)
+
+# gRPC: try CMake config first (vcpkg / source build / gRPC ≥ 1.36).
+# Ubuntu 22.04 ships gRPC 1.30.2 via apt, which has no CMake config file,
+# so fall back to pkg-config and synthesise the gRPC::grpc++ imported target.
+find_package(gRPC CONFIG QUIET)
+if(gRPC_FOUND)
+    message(STATUS "gRPC: found via CMake config (version ${gRPC_VERSION})")
+else()
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(GRPCPP REQUIRED IMPORTED_TARGET grpc++)
+    add_library(gRPC::grpc++ ALIAS PkgConfig::GRPCPP)
+    message(STATUS "gRPC: using pkg-config fallback (version ${GRPCPP_VERSION})")
+endif()
 
 # ---------------------------------------------------------------------------
 # Proto: fetch val.proto + types.proto from Eclipse Kuksa if not present.
